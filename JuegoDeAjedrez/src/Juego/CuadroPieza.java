@@ -13,6 +13,7 @@ public class CuadroPieza extends JPanel {
 
     private int inX;
     private int inY;
+     private Pieza pieza = null;
     public JLabel lbl = new JLabel();
     // para imprimir o mostrar una imagen en un jpanel
     // se realiza mediante un JLabel.
@@ -24,14 +25,48 @@ public class CuadroPieza extends JPanel {
         this.inX = x;
         this.inY = y;
     }
+    
+    
+     public Pieza getPieza() {
+        return pieza;
+    }
+   public void setPieza(Pieza pieza) {
+        this.pieza = pieza;
+        if (pieza != null) {
+            lbl.setIcon(pieza.getImagenPieza());
+            pieza.setCuadroPieza(this);
+        } else {
+            lbl.setIcon(null);
+        }
+    }
 
+    public void resaltarPieza() {
+        setBorder(javax.swing.BorderFactory.createLineBorder(Color.CYAN, 4));
+        setBackground(resaltar);
+        setBorder(null);
+    }
+
+    public void resaltarPieza(Color c) {
+        if (c != null) {
+            setBackground(c);
+            setBorder(javax.swing.BorderFactory.createLineBorder(Color.BLUE, 3));
+        } else {
+            resaltarPieza();
+        }
+    }
+
+    public void opacarPieza() {
+        setBackground(getFondo());
+        setBorder(null);
+    }
+    
      /**
      * @return the inX
      */
     public int getInX() {
         return inX;
     }
-
+  
     /**
      * @param inX the inX to set
      */
