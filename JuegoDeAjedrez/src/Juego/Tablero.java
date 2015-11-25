@@ -96,8 +96,8 @@ public class Tablero extends JPanel {
     public Tablero() {
         super();
         llenarCuadrosTablero();
-        //ordenarTablero();
-       // init();// para darle eventos mouse
+        ordenarTablero();
+        init();// para darle eventos mouse
     }
 /**
  * Este metodo crea el tablero, quiere decir que grafica el tablero en el Jpanel.
@@ -125,10 +125,12 @@ public class Tablero extends JPanel {
                 tablero[x][y].addMouseListener(new java.awt.event.MouseAdapter() {
 
                     public void mousePressed(java.awt.event.MouseEvent evt) {
+                        seleccionarPieza(evt);//cuando mouse se levantado o presionado haga esto
                         //////////////////////////////
                     }
 
                     public void mouseReleased(java.awt.event.MouseEvent evt) {
+                        dejarPieza(evt);
                         ////////////////////
                     }
                 });
@@ -150,12 +152,63 @@ public class Tablero extends JPanel {
  * Usado para seleccionar pieza, es llamada gracias al evento de clic del raton.
  * @param evt
  */
-    /////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////
+     public void seleccionarPieza(java.awt.event.MouseEvent evt) {
+        // Se pasa como parametro el evento
+        CuadroPieza t = ((CuadroPieza) evt.getComponent());//Averiguo en que cuadro sucedio el evento
+        if (t.getPieza() != null) {//Veo si el cuadro no esta vacio.
+            if (t.getPieza().getColor() == getTurno()) {//Veo si es del mismo color del turno que actualmente le toca.
+                cuadroSeleccionado = t;
+                /*
+                 * Con esto hago que se resalten los posibles movimientos en todo el tablero.
+                 */
+                for (int x = 0; x < 8; x++) {
+                    for (int y = 0; y < 8; y++) {
+                        tablero[x][y].opacarPieza();//Si hay piezas seleccionadas, las opaco
+                        if (isSeleccionarAlternativas()) {//Resalto los posibles movimientos.
+                            if (cuadroSeleccionado.getPieza().validarMovimiento(tablero[x][y], this)) {
+                                tablero[x][y].resaltarPieza(tablero[x][y].getPieza() != null ? getAlerta() : null);
+                            }
+                        }
+                    }
+                }
+                /*
+                 * Resalto el cuadro que ha sido seleccionado para que el usuario sepa que cuadro selecciono
+                 */
+                cuadroSeleccionado.resaltarPieza(getSeleccionado());
+                /*
+                 * Establesco la imagen de la pieza que ha sido seleccionada al label.
+                 */
+                tmp.setIcon(cuadroSeleccionado.getPieza().getImagenPieza());
+                /*
+                 * borro la imagen de la pieza del cuadro.
+                 */
+                cuadroSeleccionado.lbl.setIcon(null);
+                /*
+                 * Establesco la nueva posicion del label, que tiene la imagen de la pieza.
+                 */
+                tmp.setLocation(cuadroSeleccionado.getLocation().x + evt.getX() - 18, cuadroSeleccionado.getLocation().y + evt.getY() - 28);
+            }
+        }
+    }
+    
 /*
  * Es el metodo que permite soltar una pieza en determinado lugar.
  */
     ////////////////////////////////////////////////////////////
+     public void dejarPieza(java.awt.event.MouseEvent evt) {
+        if (cuadroSeleccionado.getPieza() != null) {//Si hay alguna pieza seleccionada
+            tmp.setLocation(-100, -100);//Pongo el label tmp, por donde no se vea para que no estorbe.
+            cuadroSeleccionado.lbl.setIcon(cuadroSeleccionado.getPieza().getImagenPieza());//Regreso el icono de la p ieza al cuadro que había sido seleccionado
+            tmp.setIcon(null);//Borro el icono del label.
+            CuadroPieza cuadroDestino = (CuadroPieza) this.getComponentAt(evt.getComponent().getX() + evt.getX(), evt.getComponent().getY() + evt.getY());
+            if (cuadroDestino != cuadroSeleccionado) {//Pregunto si el cuadro destino es diferente del cuadro seleccionado.
+                MoverPieza(cuadroSeleccionado, cuadroDestino);//Muevo la pieza, o al menos si es valido, el metodo decide eso.
+            }
+
+        }
+
+
+    }
     ///////////////////////////////////
 /*
  * Este metodo permite que la PC juegue sola, en el turno que se le diga.
