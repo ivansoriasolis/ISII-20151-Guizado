@@ -83,6 +83,31 @@ public abstract class Pieza {
      * @return boolean TRUE si es un movimiento valido
      */
    ////////////////////////////////////////////////////////////////////
+     public boolean validarMovimiento(CuadroPieza Destino, Tablero tbl) {
+        if (Destino.getPieza() != null) {//Si el cuadro destino esta ocupado entonces:
+            if (Destino.getPieza().getColor() == getCuadroPieza().getPieza().getColor()) {
+                //Si la pieza destino tiene el mismo color que la pieza que voy a mover
+                return false; //El movimiento es invalido, no puedo comer una pieza de mi mismo equipo.
+            }
+        }
+        //---Valido que no su rey no entre en jacke despues de que se mueva.
+        Pieza tmpDestino = Destino.getPieza();//Guardo las piezas en temporales, para deshacer los cambios
+        Pieza tmpActual = getCuadroPieza().getPieza();//Guardo las piezas en temporales, para deshacer los cambios
+        CuadroPieza Actual = getCuadroPieza();//El cuadro dode actualmente esta la pieza, tambien lo guardo.
+        Actual.setPieza(null);//simulo un movimiento, dejo el cuadro actual en vacio
+        Destino.setPieza(this);//Muevo esta pieza al cuadro destino
+        //Valido si despues de que mueva, el rey esta en jacke.
+        boolean b = tbl.getRey(getColor()).isInJacke(tbl);//Para lo cual obtengo el rey del mismo color de la pieza y le pregunto si esta en jacke
+
+        Actual.setPieza(tmpActual);//Deshago los cambios, porque SOLO valido, NO muevo piezas
+        Destino.setPieza(tmpDestino);//Deshago los cambios, porque solo valido, NO muevo piezas
+        /* 
+         * Si retorna que esta en jacke(b=true), entonces el movimiento es invalido,
+         * Si retorna que no esta en jacke(b=false), el mov. es valido.
+         */
+        return !b;
+
+    }
     /////////////////////////////////////////////
 
     /**
@@ -92,6 +117,26 @@ public abstract class Pieza {
      * @return boolean FALSE si no logra mover la pieza.
      */
    //////////////////////////////////////////////////////////////////////////////
+     public boolean MoverPieza(CuadroPieza Destino, Tablero tbl) {
+        /*
+         * Valido el movimiento, antes de mover, tener en cuenta que en las clases hijas este metodo debe haber sido sobreescrito
+         * Por lo que no solo va a validar lo que hay en el metodo validarMovimiento de Pieza, si no va a usar el metodo sobreescrito en la clase hija
+         */
+        if (validarMovimiento(Destino, tbl)) {
+            getCuadroPieza().setPieza(null);//Le paso al cuadro donde actualmente esta la pieza el valor de null, que quiere decir que ya no tiene pieza
+            if (Destino.getPieza() != null) {//Si hay una pieza en el destino
+                tbl.getPiezasComidas().add(Destino.getPieza());//Agrego la pieza que estoy comiento a un arraylist de piezas comidas.
+                setCantMovimientosSinCambios(0);//Si come a alguna pieza, reseteo el contador de movimientos sin cambios.
+            } else {
+                setCantMovimientosSinCambios(getCantMovimientosSinCambios() + 1);//Si no come alguna pieza, el contador aumenta en uno.
+            }
+            Destino.setPieza(this);//Muevo la pieza al cuadro destino
+            setFirstmov(false);//El siguiente movimiento, ya no sería el primero.
+            return true;
+        } else {
+            return false;
+        }
+    }
     ///////////////////////////////////////////////////////////////////
 /**
  * Si ya no existe movimientos posibles. el jugador esta ahogado.
@@ -100,6 +145,35 @@ public abstract class Pieza {
  * @return
  */
 ////////////////////////////////////////////////////////////////////////////////////////
+         public static boolean isJugadorAhogado(int turno, Tablero tbl) {
+  
+            CuadroPieza cuadroDestino = null;
+            CuadroPieza cuadroActual = null;
+            /*
+             * En sintesis, lo que se hace aqui es recorrer todas las piezas, y comparar si tienen algun movimiento posible, a alguna posicion del tablero.
+             * Para recorrer todas las piezas uso los dos primeros for.
+             * Para recorrer los cuadros posibles a los que se puede mover, uso los 2 siguientes for.
+             */
+            for (int x = 0; x < 8; x++) {//Busco todas las piezas del jugador del que quiero saber si esta ahogado.
+                for (int y = 0; y < 8; y++) {
+                    cuadroActual = tbl.getTablero()[y][x];
+                    if (cuadroActual.getPieza() != null) {//Si hay una pieza en el cuadro selecciondo actualmente por el for.
+                        if (cuadroActual.getPieza().getColor() == turno) {//Reviso que sea del color de pieza, que del jugador que quiero averiguar si esta ahogado.
+                            for (int x1 = 0; x1 < 8; x1++) {//Recorro todos los cuadros a del tablero preguntandole si puede moverse a ese cuadro
+                                for (int y1 = 0; y1 < 8; y1++) {
+                                    cuadroDestino = tbl.getTablero()[y1][x1];
+                                    if (cuadroActual.getPieza().validarMovimiento(cuadroDestino, tbl)) {//Si hay un movimiento posible, entonces no esta ahogado
+                                        return false;
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true;//Si no encontro algun movimiento posible, pues el usuario esta ahogado, y retorno true.
+    }
     ////////////////////////////////////////////////////////////////////////////////
 
     /**
