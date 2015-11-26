@@ -315,6 +315,71 @@ public class Tablero extends JPanel {
             jugarMaquinaSola(this.getTurno());
         }
     }
+         /*
+ * Este metodo es el que mueve la pieza a un determinado lugar, verifica que este en hacke, o este ahogado, es como el arbitro del juego..
+ */
+    public void MoverPieza(CuadroPieza cuadroActual, CuadroPieza cuadroDestino) {
+        try {
+            if (suspenderJuego) {//Si el juego no esta suspendido
+                return;
+            }
+            if (cuadroActual.getPieza().MoverPieza(cuadroDestino, this)) {//Si el movimiento es valido
+                for (int x = 0; x < 8; x++) {
+                    for (int y = 0; y < 8; y++) {
+                        tablero[x][y].opacarPieza();//Regreso todos los cuadros a su estado inicial, para que no esten resaltados.
+                    }
+                }
+                setTurno(getTurno() * -1);//Cambio de turno.
+                if (getRey(getTurno()).isInJacke(this)) {//Pregunto si el rey del turno actual, o sea al que le toca mover despues de este metodo, esta en jacke
+                    if (Pieza.isJugadorAhogado(getTurno(), this)) {//Si esta en jacke, pregunto si esta ahogado(Quiere decir que no tiene opcion.)
+                        //Si esta en jacke y esta ahogado a la vez, quiere decir que esta en jacke mate.
+                        JOptionPane.showMessageDialog(null, "Hacke Mate!!!\nComputadora: Parece que me ganaste=(");
+                        if (JOptionPane.showConfirmDialog(null, "Computadora: Te reto a que lo vuelvas a hacer, Otra¿?", "Nueva Partida", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            ordenarTablero();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Computadora: Cobarde ¬¬");
+                            suspenderJuego = true;
+                        }
+                        return;
+                    } else {
+                        //Si no esta ahogado, simplemente es un jacke.
+                        JOptionPane.showMessageDialog(null, "Rey en Hacke \nComputadora: Y ahora que hago¿? =(");
+                    }
+                } else {
+                    if (Pieza.isJugadorAhogado(getTurno(), this)) {
+                        //Si solo esta ahogado, es un empate.
+                        JOptionPane.showMessageDialog(null, "Empate!!!\nComputadora: Vamos que andamos parchis, me has ahogado!!!");
+
+                        if (JOptionPane.showConfirmDialog(null, "Deseas Empezar una nueva Partida¿?", "Nueva Partida", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            ordenarTablero();
+                        } else {
+                            suspenderJuego = true;
+                        }
+                        return;
+                    }
+                    if (Pieza.getCantMovimientosSinCambios() >= 50) {
+                        //Si han pasado 50 movimientos sin ningun cambio, tambien se considera empate.
+                        JOptionPane.showMessageDialog(null, "Empate!!! \nComputadora: Vaya, han pasado 50 turnos sin comernos jeje!!!");
+                        if (JOptionPane.showConfirmDialog(null, "Otra Partida Amistosa¿?", "Nueva Partida", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            ordenarTablero();
+                        } else {
+                            suspenderJuego = true;
+                        }
+                    }
+                }
+
+                if (getTurno() == turnoComputadora) {//Si le toca a la computadora, le toca jugar a ella.
+                    jugarMaquinaSola(getTurno());
+                }
+            } else {
+                if (getRey(getTurno()).isInJacke(this)) {//Si el movimiento es invalido, y encima el rey esta en jacke, pues es un movimiento invalido, el rey tiene que librarse del jacke
+                    JOptionPane.showMessageDialog(null, "Movimiento invalido");
+                }
+            }
+        } catch (Exception e) {
+            System.out.print("Error: " + e.getMessage());
+        }
+    }
     ///////////////////////////////////////////
 /*
  * Si hay algun cambio en quien juega arriba y quien juega abajo, se repinta el tablero.
