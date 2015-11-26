@@ -380,6 +380,41 @@ public class Tablero extends JPanel {
             System.out.print("Error: " + e.getMessage());
         }
     }
+    /**
+ * Este metodo ordena todo el tablero, quiere decir que pone las piezas blancas y las piezas negras en su sitio.(Resetea el juego)
+ */
+    public void ordenarTablero() {
+        Pieza.setCantMovimientosSinCambios(0);
+        setTurno(1);
+        suspenderJuego = false;
+        //Limpiar el tablero
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                tablero[x][y].setPieza(null);
+            }
+        }
+        int color = -1;
+        for (int i = 0; i <= 1; i++) {
+            tablero[0][i * 7].setPieza(new Torre(color));
+            tablero[1][i * 7].setPieza(new Caballo(color));
+            tablero[2][i * 7].setPieza(new Alfil(color));
+            tablero[3][i * 7].setPieza(new Reina(color));
+            Rey rey = new Rey(color);
+            setRey(rey, color);
+            tablero[4][i * 7].setPieza(rey);
+            tablero[5][i * 7].setPieza(new Alfil(color));
+            tablero[6][i * 7].setPieza(new Caballo(color));
+            tablero[7][i * 7].setPieza(new Torre(color));
+            for (int j = 0; j < 8; j++) {
+                tablero[j][i == 0 ? 1 : 6].setPieza(new Peon(color));
+            }
+            color *= -1;
+        }
+        rePintarTablero();
+        if (turnoComputadora == getTurno()) {
+            jugarMaquinaSola(getTurno());
+        }
+    }
     ///////////////////////////////////////////
 /*
  * Si hay algun cambio en quien juega arriba y quien juega abajo, se repinta el tablero.
