@@ -15,6 +15,7 @@ public class Ajedrez extends javax.swing.JFrame {
     /** Creates new form Ajedrez */
     public Ajedrez() {
         initComponents();
+        tablero1.ordenarTablero();
        
     }
 
@@ -91,7 +92,7 @@ public class Ajedrez extends javax.swing.JFrame {
 
     private void MenuItemIniciarPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemIniciarPartidaActionPerformed
         if (JOptionPane.showConfirmDialog(this, "Esta Seguro", "Desea Cancelar la Partida ¿?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            
+         tablero1.ordenarTablero();   
         }
 }//GEN-LAST:event_MenuItemIniciarPartidaActionPerformed
 
@@ -100,7 +101,8 @@ public class Ajedrez extends javax.swing.JFrame {
     }//GEN-LAST:event_MenuItemSalirActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-
+IUOpciones opc = new IUOpciones(this, true, tablero1);
+        opc.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**

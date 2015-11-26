@@ -389,7 +389,7 @@ public class IUOpciones extends javax.swing.JDialog {
         tablero.setBlancoResaltado(pnlBlancoResaltado.getBackground());
         tablero.setSeleccionado(pnlSeleccionado.getBackground());
         tablero.setAlerta(pnlAlerta.getBackground());
-       // tablero.ordenarTablero();
+        tablero.ordenarTablero();
         this.dispose();
     }//GEN-LAST:event_btnAceptarActionPerformed
 
