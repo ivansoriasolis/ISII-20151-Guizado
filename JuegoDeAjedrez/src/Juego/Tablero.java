@@ -214,6 +214,107 @@ public class Tablero extends JPanel {
  * Este metodo permite que la PC juegue sola, en el turno que se le diga.
  */
 ///////////////////////////////////////////////////////////////////////////
+         public void jugarMaquinaSola(int turno) {
+        if (suspenderJuego) {
+            return;
+        }
+        CuadroPieza cuadroActual;
+        CuadroPieza cuadroDestino;
+        CuadroPieza MovDestino = null;
+        CuadroPieza MovActual = null;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                cuadroActual = tablero[x][y];
+                if (cuadroActual.getPieza() != null) {
+                    if (cuadroActual.getPieza().getColor() == turno) {
+                        for (int x1 = 0; x1 < 8; x1++) {
+                            for (int y1 = 0; y1 < 8; y1++) {
+                                cuadroDestino = tablero[x1][y1];
+                                if (cuadroDestino.getPieza() != null) {
+                                    if (cuadroActual.getPieza().validarMovimiento(cuadroDestino, this)) {
+                                        if (MovDestino == null) {
+                                            MovActual = cuadroActual;
+                                            MovDestino = cuadroDestino;
+                                        } else {
+                                            if (cuadroDestino.getPieza().getPeso() > MovDestino.getPieza().getPeso()) {
+                                                MovActual = cuadroActual;
+                                                MovDestino = cuadroDestino;
+                                            }
+                                            if (cuadroDestino.getPieza().getPeso() == MovDestino.getPieza().getPeso()) {
+                                                //Si es el mismo, elijo al azar si moverlo o no
+                                                if (((int) (Math.random() * 3) == 1)) {
+                                                    MovActual = cuadroActual;
+                                                    MovDestino = cuadroDestino;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (MovActual == null) {
+            boolean b = true;
+            do {//Si no hay mov recomendado, entonces genero uno al azar
+                int x = (int) (Math.random() * 8);
+                int y = (int) (Math.random() * 8);
+                tablero[x][y].getPieza();
+                int x1 = (int) (Math.random() * 8);
+                int y1 = (int) (Math.random() * 8);
+
+                MovActual = tablero[x][y];
+                MovDestino = tablero[x1][y1];
+                if (MovActual.getPieza() != null) {
+                    if (MovActual.getPieza().getColor() == turno) {
+                        b = !MovActual.getPieza().validarMovimiento(MovDestino, this);
+                    //Si mueve la pieza, sale del while.
+                    }
+                }
+            } while (b);
+        }
+        if (MovActual.getPieza().MoverPieza(MovDestino, this)) {
+            this.setTurno(this.getTurno() * -1);
+            if (getRey(this.getTurno()).isInJacke(this)) {
+                if (Pieza.isJugadorAhogado(turno, this)) {
+                    JOptionPane.showMessageDialog(null, "Hacke Mate!!! - te lo dije xD");
+                    if (JOptionPane.showConfirmDialog(null, "Deseas Empezar una nueva Partida¿?", "Nueva Partida", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        ordenarTablero();
+                    } else {
+                        suspenderJuego = true;
+                    }
+                    return;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Rey en Hacke -  ya t kgste");
+                }
+            } else {
+                if (Pieza.isJugadorAhogado(turno, this)) {
+                    JOptionPane.showMessageDialog(null, "Empate!!!\nComputadora: Solo por que te ahogaste...!!!");
+                    if (JOptionPane.showConfirmDialog(null, "Deseas Empezar una nueva Partida¿?", "Nueva Partida", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        ordenarTablero();
+                    } else {
+                        suspenderJuego = true;
+                    }
+                    return;
+                }
+                if (Pieza.getCantMovimientosSinCambios() >= 50) {
+                    JOptionPane.showMessageDialog(null, "Empate!!! \nComputadora: Vaya, han pasado 50 turnos sin comernos jeje!!!");
+                    if (JOptionPane.showConfirmDialog(null, "Otra Partida Amistosa¿?", "Nueva Partida", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        ordenarTablero();
+                    } else {
+                        suspenderJuego = true;
+                    }
+                    return;
+                }
+            }
+        }
+        if (this.getTurno() == turnoComputadora) {
+            jugarMaquinaSola(this.getTurno());
+        }
+    }
     ///////////////////////////////////////////
 /*
  * Si hay algun cambio en quien juega arriba y quien juega abajo, se repinta el tablero.
