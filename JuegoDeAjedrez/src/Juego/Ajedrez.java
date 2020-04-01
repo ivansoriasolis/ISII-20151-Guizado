@@ -15,6 +15,7 @@ public class Ajedrez extends javax.swing.JFrame {
     /** Creates new form Ajedrez */
     public Ajedrez() {
         initComponents();
+        tablero1.ordenarTablero();
        
     }
 
@@ -27,6 +28,7 @@ public class Ajedrez extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        tablero1 = new Juego.Tablero();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         MenuItemIniciarPartida = new javax.swing.JMenuItem();
@@ -35,6 +37,8 @@ public class Ajedrez extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        tablero1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jMenu1.setText("Archivo");
 
@@ -76,11 +80,11 @@ public class Ajedrez extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 448, Short.MAX_VALUE)
+            .addComponent(tablero1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 448, Short.MAX_VALUE)
+            .addComponent(tablero1, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -88,7 +92,7 @@ public class Ajedrez extends javax.swing.JFrame {
 
     private void MenuItemIniciarPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemIniciarPartidaActionPerformed
         if (JOptionPane.showConfirmDialog(this, "Esta Seguro", "Desea Cancelar la Partida ¿?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            
+         tablero1.ordenarTablero();   
         }
 }//GEN-LAST:event_MenuItemIniciarPartidaActionPerformed
 
@@ -97,7 +101,8 @@ public class Ajedrez extends javax.swing.JFrame {
     }//GEN-LAST:event_MenuItemSalirActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-
+IUOpciones opc = new IUOpciones(this, true, tablero1);
+        opc.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
@@ -118,5 +123,6 @@ public class Ajedrez extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private Juego.Tablero tablero1;
     // End of variables declaration//GEN-END:variables
 }
